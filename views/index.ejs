@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI content recomedation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-image: url('https://img.freepik.com/free-photo/movie-background-collage_23-2149876030.jpg');
+            background-size: cover;
+            background-attachment: fixed;
+            color: #e0e0e0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 600px;
+            text-align: justify;
+            backdrop-filter: blur(10px);
+        }
+        
+        header h1 {
+            font-size: 2.2rem;
+            color: #00ffff;
+            margin-bottom: 1rem;
+            text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+            text-align: center;
+        }
+        
+        nav {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        nav a {
+            color: #00aaff;
+            font-size: 1.2rem;
+            text-decoration: none;
+            padding: 0.5rem;
+            transition: color 0.3s, border-bottom 0.3s;
+        }
+        
+        nav a:hover {
+            color: #00ffff;
+        }
+        
+        nav a.active {
+            color: #00ffff;
+            border-bottom: 2px solid #00ffff;
+        }
+        
+        .genres {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .genre-card {
+            position: relative;
+            width: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 10px;
+            padding: 20px;
+            border: 2px solid #00ffff;
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+        }
+        
+        .genre-card .badge {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: #00aaff;
+            color: #fff;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 0.9rem;
+        }
+        
+        .list h4 {
+            margin: 10px 0;
+            font-weight: normal;
+        }
+        
+        .list .highlight {
+            font-weight: bold;
+            color: #00ffff;
+        }
+        
+        .description {
+            margin-top: 10px;
+            line-height: 1.5;
+        }
+        
+        .genre-button2 {
+            background-color: #00ffff;
+            color: #1c1c1c;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 20px;
+            font-size: 1rem;
+            font-weight: bold;
+            text-align: center;
+            margin-top: 20px;
+            cursor: pointer;
+            transition: background 0.3s, transform 0.2s;
+        }
+        
+        .genre-button2:hover {
+            background-color: #00aaff;
+            transform: scale(1.05);
+        }
+        .list{
+            margin-top: 2%;
+        }
+        .genre-button-container {
+            position: relative;
+        }
+        
+        .genre-button1 {
+            background-color: #e0e0e0;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        
+        .selected-genre {
+            margin-left: 10px;
+            font-weight: bold;
+        }
+        
+        .genre-menu {
+            display: none;
+            position: absolute;
+            top: 40px;
+            left: 0;
+            background-color: #ffffff;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            width: 200px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .genre-menu ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+        
+        .genre-menu ul li {
+            padding: 10px;
+            border-bottom: 1px solid  #e0e0e0;
+            cursor: pointer;
+            font-weight: bold;
+            color: black;
+        }
+        
+        .genre-menu ul li:hover {
+            background-color: #e0f7fa;
+        }
+        
+        .genre-menu ul li:last-child {
+            border-bottom: none;
+        }
+        .genre-button-container {
+           
+            margin-top: 23px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Cinema Muchatlu</h1>
+        </header>
+        
+        <nav>
+            <a href="#" class="active" >MOVIES</a>
+            <a href="#" name="" value="series">SERIES</a>
+        </nav>
+        <form action="/showmov" method="post" id="template">
+            <section class="genres">
+                <div class="genre-card">
+                    <span class="badge"><%= type || 'Movie' %></span>
+        
+                    <div class="genre-button-container">
+                        <!-- The button to open genre selection -->
+                        <button type="button" id="genreButton" class="genre-button1">
+                            <span>&#x2630;</span> Select Genre
+                        </button>
+                        <span id="selectedGenreText" class="selected-genre"><%= selectedGenre || 'All Genres' %></span>
+                    </div>
+        
+                    <!-- Hidden input to store the selected genre value for form submission -->
+                    <input type="hidden" id="selectedGenre" name="selectedGenre" value="<%= selectedGenre || 'All Genres' %>">
+        
+                    <!-- Genre dropdown menu -->
+                    <div id="genreMenu" class="genre-menu">
+                        <ul>
+                            <li onclick="selectGenre('All Genres')">All Genres</li>
+                            <li onclick="selectGenre('Adventure')">Adventure</li>
+                            <li onclick="selectGenre('Drama')">Drama</li>
+                            <li onclick="selectGenre('Crime')">Crime</li>
+                            <li onclick="selectGenre('Romance')">Romance</li>
+                            <li onclick="selectGenre('Action')">Action</li>
+                            <li onclick="selectGenre('Thriller')">Thriller</li>
+                            <li onclick="selectGenre('Suspense')">Suspense</li>
+                            <li onclick="selectGenre('Sci-Fi')">Sci-Fi</li>
+                            <li onclick="selectGenre('Biography')">Biography</li>
+                        </ul>
+                    </div>
+        
+                    <div class="list">
+                        <% if (locals.name) { %>
+                            <h4>Name : <%= locals.name %></h4>
+                            <h4>IMDB rating : <%= locals.imdb %></h4>
+                            <h4>Genre: <%= locals.genre %></h4>
+                            <h4>Description:</h4>
+                            <p><%= locals.description %></p>
+                        <% } %>
+                    </div>
+        
+                    <!-- Submit button to suggest a movie or series -->
+                    <div>
+                        <button type="submit" class="genre-button2" style="width: 100%;">Suggest me a movie name</button>
+                    </div>
+                </div>
+            </section>
+        </form>
+        
+    </div>
+    <script >
+        document.addEventListener("DOMContentLoaded", function() {
+   
+   const navLinks = document.querySelectorAll("nav a");
+
+   navLinks.forEach(link => {
+       link.addEventListener("click", function() {
+           
+           // Remove the "active" class from all links
+           navLinks.forEach(link => link.classList.remove("active"));
+           navLinks.forEach(link=>link.setAttribute("name",""));
+          
+           // Add the "active" class to the clicked link
+           this.classList.add("active");
+           this.setAttribute("name","type");
+   
+           // Retrieve the text of the active link and update the genre-button text
+           if (document.getElementsByClassName("active")[0].innerHTML === "MOVIES") {
+    document.getElementsByClassName("genre-button2")[0].innerHTML = "Suggest me a movie name";
+    document.querySelector("form").setAttribute("action", "/showmov");
+} else {
+    document.getElementsByClassName("genre-button2")[0].innerHTML = "Suggest me a series name";
+    document.querySelector("form").setAttribute("action", "/showser");
+}
+
+       });
+   });
+   document.getElementsByClassName("genre-button2")[0].addEventListener("click",function(){
+       if(document.getElementsByClassName("genre-button2")[0].innerHTML ==`Suggest me a movie name`)
+           document.getElementsByClassName("badge")[0].innerHTML = `Movie`;
+       else
+        document.getElementsByClassName("badge")[0].innerHTML = `Series`
+
+   });
+
+   
+   const genreCards = document.querySelectorAll(".genre-card");
+
+   genreCards.forEach(card => {
+       card.addEventListener("mouseover", function() {
+           this.style.transform = "scale(1.05)";
+           this.style.transition = "transform 0.3s ease";
+       });
+
+       card.addEventListener("mouseout", function() {
+           this.style.transform = "scale(1)";
+           this.style.transition = "transform 0.3s ease";
+       });
+
+      
+   });
+});
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const genreButton = document.getElementById('genreButton');
+        const genreMenu = document.getElementById('genreMenu');
+        const selectedGenreText = document.getElementById('selectedGenreText');
+        const selectedGenreInput = document.getElementById('selectedGenre');
+
+        // Toggle the dropdown menu
+        genreButton.addEventListener('click', (event) => {
+            event.preventDefault(); // Prevent form submission when clicking the genre button
+            genreMenu.style.display = genreMenu.style.display === 'block' ? 'none' : 'block';
+        });
+
+        // Function to handle genre selection
+        window.selectGenre = (genre) => {
+            selectedGenreText.textContent = genre;
+            selectedGenreInput.value = genre; // Set the hidden input value
+            genreMenu.style.display = 'none';
+        };
+
+        // Close the genre menu if clicked outside
+        document.addEventListener('click', (event) => {
+            if (!genreButton.contains(event.target) && !genreMenu.contains(event.target)) {
+                genreMenu.style.display = 'none';
+            }
+        });
+    });
+</script>
+</body>
+</html>
